@@ -94,8 +94,13 @@ void MainController::draw_emissive_model(const std::string &model_name,
 
     if(shader_name == std::string("zvezda") && model_name == std::string("zvezda")) {
         auto platform =engine::core::Controller::get<engine::platform::PlatformController>();
-        shader->set_vec3("emissiveColor",
-            m_star_color*glm::vec3(5.0f+2.0*sin(platform->frame_time().current)));//intezitet
+        //float vreme = platform->frame_time().current;
+        if(platform->frame_time().current-m_trigger_time<5.0f) {
+            shader->set_vec3("emissiveColor",
+                m_star_color*glm::vec3(15.0f+10.0*sin(3.0f*platform->frame_time().current)));//intezitet
+        }else {
+            shader->set_vec3("emissiveColor",5.0f*m_star_color);
+        }
     }
 
     model->draw(shader);
@@ -282,6 +287,9 @@ void MainController::update_bloom_state() {
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     if(platform->key(engine::platform::KeyId::KEY_F).state()==engine::platform::Key::State::JustPressed) {
         graphics->set_bloom_state(!graphics->get_bloom_state());
+    }
+    if(graphics->get_bloom_state()) {
+        m_trigger_time = platform->frame_time().current;
     }
 }
 
